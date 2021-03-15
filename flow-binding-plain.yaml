@@ -9,8 +9,7 @@ spec:
       apiVersion: camel.apache.org/v1alpha1
       name: simulation-source
     properties:
-      message: '{"name": "Nicola Ferraro", "username": "nicolaferraro"}'
-      contentType: "application/json"
+      message: 'Nicola Ferraro'
   sink:
     ref:
       kind: Kamelet

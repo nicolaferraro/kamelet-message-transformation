@@ -5,40 +5,12 @@ metadata:
   labels:
     camel.apache.org/kamelet.type: "action"
 spec:
-  sources:
-  - content: |
-      // This processor is written inside the Kamelet only for demonstration purposes (don't do this in production)
-
-      import java.util.HashMap;
-      import java.util.Map;
-
-      import org.apache.camel.ExchangeProperty;
-      import org.apache.camel.builder.RouteBuilder;
-
-      public class Source extends RouteBuilder {
-        @Override
-        public void configure() throws Exception {
-
-            from("direct:insert-field-kamelet-transform")
-              .bean(this, "insertField");
-
-        }
-
-        public Map insertField(@ExchangeProperty("field") String field, @ExchangeProperty("value") String value, Map body) {
-          if (body == null) {
-            body = new HashMap();
-          }
-          body.put(field, value);
-          return body;
-        }
-
-      }
-    name: Source.java
   definition:
     title: "Insert Field"
     description: "Adds a custom field with a constant value to the message"
     required:
-      - message
+      - field
+      - value
     properties:
       field:
         title: Field
@@ -48,6 +20,8 @@ spec:
         title: Value
         description: The value of the field
         type: string
+  dependencies:
+  - github:nicolaferraro:kamelet-message-transformation:main-SNAPSHOT
   flow:
     from:
       uri: kamelet:source
@@ -60,6 +34,6 @@ spec:
         - set-property:
             name: "value"
             constant: "{{value}}"
-        - to: "direct:insert-field-kamelet-transform"
+        - bean: "com.github.nicolaferraro.kamelets.InsertField"
         - marshal:
             json: {}

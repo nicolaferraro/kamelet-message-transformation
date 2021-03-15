@@ -9,16 +9,28 @@ spec:
       apiVersion: camel.apache.org/v1alpha1
       name: simulation-source
     properties:
-      message: '{"name": "Nicola Ferraro", "username": "nicolaferraro"}'
-      contentType: "application/json"
+      message: 'Nicola Ferraro'
   steps:
+  - ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1alpha1
+      name: hoist-field
+    properties:
+      field: "name"
   - ref:
       kind: Kamelet
       apiVersion: camel.apache.org/v1alpha1
       name: insert-field
     properties:
-      field: "team"
-      value: "Fuse"
+      field: "username"
+      value: "nicolaferraro"
+  - ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1alpha1
+      name: insert-field
+    properties:
+      field: "twitter"
+      value: "@ni_ferraro"
   sink:
     ref:
       kind: Kamelet

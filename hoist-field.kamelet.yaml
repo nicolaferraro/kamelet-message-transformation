@@ -1,0 +1,57 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: hoist-field
+  labels:
+    camel.apache.org/kamelet.type: "action"
+spec:
+  sources:
+  - content: |
+      // This processor is written inside the Kamelet only for demonstration purposes (don't do this in production)
+
+      import java.util.HashMap;
+      import java.util.Map;
+
+      import org.apache.camel.ExchangeProperty;
+      import org.apache.camel.builder.RouteBuilder;
+
+      public class HoistFieldSource extends RouteBuilder {
+        @Override
+        public void configure() throws Exception {
+
+            from("direct:hoist-field-kamelet-transform")
+              .bean(this, "hoistField");
+
+        }
+
+        public Map hoistField(@ExchangeProperty("field") String field, String value) {
+          Map body = new HashMap();
+          body.put(field, value);
+          return body;
+        }
+
+      }
+    name: HoistFieldSource.java
+  definition:
+    title: "Insert Field"
+    description: "Adds a custom field with a constant value to the message"
+    required:
+      - field
+    properties:
+      field:
+        title: Field
+        description: The name of the field to be used
+        type: string
+  flow:
+    from:
+      uri: kamelet:source
+      steps:
+        - set-property:
+            name: "field"
+            constant: "{{field}}"
+        - to: "direct:hoist-field-kamelet-transform"
+        - set-header:
+            name: "Content-Type"
+            value: "application/json"
+        - marshal:
+            json: {}
