@@ -1,0 +1,65 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: insert-field
+  labels:
+    camel.apache.org/kamelet.type: "action"
+spec:
+  sources:
+  - content: |
+      // This processor is written inside the Kamelet only for demonstration purposes (don't do this in production)
+
+      import java.util.HashMap;
+      import java.util.Map;
+
+      import org.apache.camel.ExchangeProperty;
+      import org.apache.camel.builder.RouteBuilder;
+
+      public class Source extends RouteBuilder {
+        @Override
+        public void configure() throws Exception {
+
+            from("direct:insert-field-kamelet-transform")
+              .bean(this, "insertField");
+
+        }
+
+        public Map insertField(@ExchangeProperty("field") String field, @ExchangeProperty("value") String value, Map body) {
+          if (body == null) {
+            body = new HashMap();
+          }
+          body.put(field, value);
+          return body;
+        }
+
+      }
+    name: Source.java
+  definition:
+    title: "Insert Field"
+    description: "Adds a custom field with a constant value to the message"
+    required:
+      - message
+    properties:
+      field:
+        title: Field
+        description: The name of the field to be added
+        type: string
+      value:
+        title: Value
+        description: The value of the field
+        type: string
+  flow:
+    from:
+      uri: kamelet:source
+      steps:
+        - unmarshal:
+            json: {}
+        - set-property:
+            name: "field"
+            constant: "{{field}}"
+        - set-property:
+            name: "value"
+            constant: "{{value}}"
+        - to: "direct:insert-field-kamelet-transform"
+        - marshal:
+            json: {}
