@@ -52,6 +52,6 @@ spec:
         - to: "direct:hoist-field-kamelet-transform"
         - set-header:
             name: "Content-Type"
-            value: "application/json"
+            constant: "application/json"
         - marshal:
             json: {}
