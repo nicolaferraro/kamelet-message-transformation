@@ -1,6 +1,6 @@
 # Kamelet Message Transformation
 
-This example shows how the Kamelet can be used for doing single message transformation.
+This example shows how the Kamelet model can be used for doing single message transformation.
 
 Examples are inspired by [Kafka Connect Transformations](https://docs.confluent.io/platform/current/connect/transforms/overview.html).
 
